@@ -12,16 +12,17 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "stm32f4xx_hal_def.h"
-#define usTIM TIM3
+#define usTIM TIM1
 
 void SystemClock_Config(void);
 void GPIO_Init(void);
+void TIMER1_Init(void);
 void UART2_Init(void);
 void TIMER3_Init(void);
 void Error_handler(void);
 void usDelay(uint32_t uSec);
 
-
+TIM_HandleTypeDef htimer1;
 TIM_HandleTypeDef htimer3;
 UART_HandleTypeDef huart2;
 
@@ -43,6 +44,7 @@ int main(void)
 	SystemClock_Config();
 	GPIO_Init();
 	UART2_Init();
+	TIMER1_Init();
 	TIMER3_Init();
 
 		 while (1)
@@ -179,6 +181,35 @@ void usDelay(uint32_t uSec)
 	usTIM->SR &= ~(0x0001);
 }
 
+void TIMER1_Init(void)
+{
+
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	htimer1.Instance = TIM1;
+	htimer1.Init.Prescaler = 84-1;
+	htimer1.Init.CounterMode= TIM_COUNTERMODE_UP;
+	htimer1.Init.Period = 0;
+	htimer1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htimer1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	if( HAL_TIM_Base_Init(&htimer1) != HAL_OK )
+	{
+		Error_handler();
+	}
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	 if (HAL_TIM_ConfigClockSource(&htimer1, &sClockSourceConfig) != HAL_OK)
+	 {
+	    Error_handler();
+	 }
+	 sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	 sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	 if (HAL_TIMEx_MasterConfigSynchronization(&htimer1, &sMasterConfig) != HAL_OK)
+	 {
+	   Error_handler();
+	 }
+
+}
+
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
@@ -272,4 +303,3 @@ void Error_handler(void)
 {
 
 }
-
