@@ -2,7 +2,7 @@
  * msp.c
  *
  *  Created on: 02-Jun-2018
- *      Author: kiran
+ *      Author: Dell
  */
 #include "stm32f4xx_hal.h"
 
@@ -31,7 +31,16 @@ void HAL_MspInit(void)
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(htim_base->Instance==TIM3)
+
+    if(htim_base->Instance==TIM1)
+    {
+
+      /* Peripheral clock enable */
+      __HAL_RCC_TIM1_CLK_ENABLE();
+
+    }
+
+  else if(htim_base->Instance==TIM3)
   {
 
     /* Peripheral clock enable */
@@ -64,7 +73,15 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 */
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 {
-  if(htim_base->Instance==TIM3)
+	if(htim_base->Instance==TIM1)
+	  {
+
+	    /* Peripheral clock disable */
+	    __HAL_RCC_TIM1_CLK_DISABLE();
+
+	  }
+
+else if(htim_base->Instance==TIM3)
   {
 
     /* Peripheral clock disable */
@@ -126,4 +143,3 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
   }
 
 }
-
