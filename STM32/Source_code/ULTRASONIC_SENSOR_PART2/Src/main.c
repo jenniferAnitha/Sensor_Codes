@@ -18,12 +18,12 @@ void SystemClock_Config(void);
 void GPIO_Init(void);
 void TIMER1_Init(void);
 void UART2_Init(void);
-void TIMER3_Init(void);
+void TIMER2_Init(void);
 void Error_handler(void);
 void usDelay(uint32_t uSec);
 
 TIM_HandleTypeDef htimer1;
-TIM_HandleTypeDef htimer3;
+TIM_HandleTypeDef htimer2;
 UART_HandleTypeDef huart2;
 
 
@@ -45,7 +45,7 @@ int main(void)
 	GPIO_Init();
 	UART2_Init();
 	TIMER1_Init();
-	TIMER3_Init();
+	TIMER2_Init();
 
 		 while (1)
 		  {
@@ -62,7 +62,7 @@ int main(void)
 				//2. ECHO signal pulse width
 
 				//Start IC timer
-				HAL_TIM_IC_Start_IT(&htimer3, TIM_CHANNEL_1);
+				HAL_TIM_IC_Start_IT(&htimer2, TIM_CHANNEL_1);
 				//Wait for IC flag
 				uint32_t startTick = HAL_GetTick();
 				do
@@ -70,7 +70,7 @@ int main(void)
 					if(icFlag) break;
 				}while((HAL_GetTick() - startTick) < 500);  //500ms
 				icFlag = 0;
-				HAL_TIM_IC_Stop_IT(&htimer3, TIM_CHANNEL_1);
+				HAL_TIM_IC_Stop_IT(&htimer2, TIM_CHANNEL_1);
 
 				//Calculate distance in cm
 				if(edge2Time > edge1Time)
@@ -218,7 +218,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 		if(captureIdx == 0) //First edge
 		{
-			edge1Time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);// __HAL_TIM_GetCounter(&htimer3);// ;
+			edge1Time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);// __HAL_TIM_GetCounter(&hTIMER2);// ;
 
 			captureIdx = 1;
 		}
@@ -234,7 +234,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 
 
-void TIMER3_Init(void)
+void TIMER2_Init(void)
 {
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
@@ -242,28 +242,28 @@ void TIMER3_Init(void)
   TIM_IC_InitTypeDef sConfigIC = {0};
 
 
-  htimer3.Instance = TIM3;
-  htimer3.Init.Prescaler = 84-1;
-  htimer3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htimer3.Init.Period = 1000000-1; //1sec
-  htimer3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htimer3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htimer3) != HAL_OK)
+  htimer2.Instance = TIM2;
+  htimer2.Init.Prescaler = 84-1;
+  htimer2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htimer2.Init.Period = 1000000-1; //1sec
+  htimer2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htimer2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htimer2) != HAL_OK)
   {
     Error_handler();
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htimer3, &sClockSourceConfig) != HAL_OK)
+  if (HAL_TIM_ConfigClockSource(&htimer2, &sClockSourceConfig) != HAL_OK)
   {
     Error_handler();
   }
-  if (HAL_TIM_IC_Init(&htimer3) != HAL_OK)
+  if (HAL_TIM_IC_Init(&htimer2) != HAL_OK)
   {
     Error_handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htimer3, &sMasterConfig) != HAL_OK)
+  if (HAL_TIMEx_MasterConfigSynchronization(&htimer2, &sMasterConfig) != HAL_OK)
   {
     Error_handler();
   }
@@ -271,7 +271,7 @@ void TIMER3_Init(void)
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 4;
-  if (HAL_TIM_IC_ConfigChannel(&htimer3, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_IC_ConfigChannel(&htimer2, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_handler();
   }

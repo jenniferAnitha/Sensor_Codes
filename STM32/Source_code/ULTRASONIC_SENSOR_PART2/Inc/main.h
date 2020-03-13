@@ -2,8 +2,6 @@
 #define MAIN_H_
 
 #include "stm32f4xx_hal.h"
-#define TRUE 1
-#define FALSE 0
 
 #define SYS_CLOCK_FREQ_50_MHZ 50
 #define SYS_CLOCK_FREQ_84_MHZ 84
