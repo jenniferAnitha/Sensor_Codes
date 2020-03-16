@@ -4,9 +4,16 @@
 
 #define led 11 //pin 11 as Led output*/
 // defines pins number
-const int trigPin=13;
-const int echoPin=12;
-const int led=11;
+const int trigPin=2;
+const int echoPin=3;
+const int led=10;
+
+
+
+
+float distance=0;
+unsigned long duration=0;
+float error_Factor=0.65;
 
 void setup()
 
@@ -23,8 +30,7 @@ pinMode(led, OUTPUT);
 
 void loop()
 
-{ 
-  long duration, distance;// define variables
+{
 
 digitalWrite(trigPin, LOW);
 
@@ -32,15 +38,20 @@ delayMicroseconds(2);
 //Sets the trigPin on high state for 10 micro seconds
 
 digitalWrite(trigPin, HIGH);
-
 delayMicroseconds(10);
 
 digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+
 //Reads the echoPin, returns the sound wave travel time in microseconds
 
 duration = pulseIn(echoPin, HIGH);
-//calculate the distance
-distance = duration * 0.034/2;
+
+
+
+//calculate the distance (CM and inches)
+distance=((duration *0.0340)/2)- error_Factor;
+
 
 if (distance <= 10)
 
@@ -64,4 +75,3 @@ Serial.println(distance);
 delay(300);
 
 }
-
