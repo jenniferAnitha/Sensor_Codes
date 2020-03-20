@@ -175,7 +175,7 @@ void TIMER1_Init(void)
 	htimer1.Instance = TIM1;
 	htimer1.Init.Prescaler = 84-1;
 	htimer1.Init.CounterMode= TIM_COUNTERMODE_UP;
-	htimer1.Init.Period = 0xFFFF-1;
+	htimer1.Init.Period = 0xFFFFFFFF-1;
 	htimer1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htimer1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if( HAL_TIM_Base_Init(&htimer1) != HAL_OK )
