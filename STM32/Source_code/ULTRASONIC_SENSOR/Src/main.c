@@ -12,7 +12,7 @@
 #include "main.h"
 #include "stm32f4xx_hal_def.h"
 
-void SystemClock_Config(void);
+void SystemClockConfig(uint8_t clock_freq );
 void GPIO_Init(void);
 void TIMER1_Init(void);
 void UART2_Init(void);
@@ -29,7 +29,7 @@ int main(void)
 {
 	uint32_t noTicks=0;
 	HAL_Init();
-	SystemClock_Config();
+	SystemClockConfig(SYS_CLOCK_FREQ_84_MHZ);
 	GPIO_Init();
 	UART2_Init();
 	TIMER1_Init();
@@ -87,43 +87,88 @@ int main(void)
 }
 }
 
-void SystemClock_Config(void)
+void SystemClockConfig(uint8_t clock_freq )
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_OscInitTypeDef Osc_Init;
+	RCC_ClkInitTypeDef Clock_Init;
 
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-  RCC_OscInitStruct.PLL.PLLQ = 7;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_handler();
-  }
-  /** Initializes the CPU, AHB and APB busses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_handler();
-  }
+	Osc_Init.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	Osc_Init.HSIState = RCC_HSI_ON;
+	Osc_Init.HSICalibrationValue = 16;
+	Osc_Init.PLL.PLLState = RCC_PLL_ON;
+	Osc_Init.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+
+	switch(clock_freq)
+	 {
+	  case SYS_CLOCK_FREQ_50_MHZ:
+		  Osc_Init.PLL.PLLM = 8;
+		  Osc_Init.PLL.PLLN = 50;
+		  Osc_Init.PLL.PLLP = RCC_PLLP_DIV2;
+		  Osc_Init.PLL.PLLQ = 2;
+		  Clock_Init.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+	                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+		  Clock_Init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		  Clock_Init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		  Clock_Init.APB1CLKDivider = RCC_HCLK_DIV2;
+		  Clock_Init.APB2CLKDivider = RCC_HCLK_DIV1;
+	     break;
+
+	  case SYS_CLOCK_FREQ_84_MHZ:
+		  Osc_Init.PLL.PLLM = 16;
+		  Osc_Init.PLL.PLLN = 336;
+		  Osc_Init.PLL.PLLP = RCC_PLLP_DIV4;
+		  Osc_Init.PLL.PLLQ = 7;
+		  Clock_Init.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+	                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+		  Clock_Init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		  Clock_Init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		  Clock_Init.APB1CLKDivider = RCC_HCLK_DIV2;
+		  Clock_Init.APB2CLKDivider = RCC_HCLK_DIV1;
+	     break;
+
+	  case SYS_CLOCK_FREQ_120_MHZ:
+		  Osc_Init.PLL.PLLM = 8;
+		  Osc_Init.PLL.PLLN = 120;
+		  Osc_Init.PLL.PLLP = RCC_PLLP_DIV2;
+		  Osc_Init.PLL.PLLQ = 2;
+		//  Osc_Init.PLL.PLLR = 2;
+		  Clock_Init.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+	                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+		  Clock_Init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		  Clock_Init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		  Clock_Init.APB1CLKDivider = RCC_HCLK_DIV4;
+		  Clock_Init.APB2CLKDivider = RCC_HCLK_DIV2;
+	     break;
+
+	  default:
+	   return ;
+	 }
+
+		if (HAL_RCC_OscConfig(&Osc_Init) != HAL_OK)
+	{
+			Error_handler();
+	}
+
+
+
+	if (HAL_RCC_ClockConfig(&Clock_Init, FLASH_LATENCY_2) != HAL_OK)
+	{
+		Error_handler();
+	}
+
+
+	/*Configure the systick timer interrupt frequency (for every 1 ms) */
+	uint32_t hclk_freq = HAL_RCC_GetHCLKFreq();
+	HAL_SYSTICK_Config(hclk_freq/1000);
+
+	/**Configure the Systick
+	*/
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+
+	/* SysTick_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+
 }
 			   /**
 			     * @brief System Clock Configuration
