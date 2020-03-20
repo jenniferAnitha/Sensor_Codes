@@ -11,7 +11,6 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "stm32f4xx_hal_def.h"
-#define usTIM TIM1
 
 void SystemClock_Config(void);
 void GPIO_Init(void);
@@ -21,8 +20,9 @@ void Error_handler(void);
 TIM_HandleTypeDef htimer1;
 UART_HandleTypeDef huart2;
 
-void usDelay(uint32_t uSec);
-const float speedOfSound = 0.0343/2;
+void delay_us(uint32_t us);
+const float speedOfSound = 0.0340/2;
+const float error_Factor=0.65;
 float distance;
 char uartBuf[100];
 int main(void)
@@ -32,23 +32,21 @@ int main(void)
 	SystemClock_Config();
 	GPIO_Init();
 	UART2_Init();
-
 	TIMER1_Init();
-
+	HAL_TIM_Base_Start(&htimer1);
 	while(1)
 	{
 		// Set the TRIG pin to low for few seconds
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_RESET);
-		usDelay(3);
+		delay_us(3);
 
 		// Start the ultrasonic routine
 
 		//1. Output 10Microsecond in TRIG
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
-		usDelay(10);
+		delay_us(10);
 
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_RESET);
-
 		//2. Measure the echo signal
 		// wait for echo pin rising edge
 		while(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)== GPIO_PIN_RESET);
@@ -60,31 +58,33 @@ int main(void)
 		while(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)== GPIO_PIN_SET)
 		{
 			noTicks++;
-			usDelay(2);//2.8 us
+			delay_us(2);//2.8 us
 
 		};
 
 
 		//4. Estimate the distance in Cm
 
-		distance =(noTicks + 0.0f)* 2.8 *speedOfSound;
+		distance = ((noTicks + 0.0f)*2.8*speedOfSound)- error_Factor;
+
 		//5. Print to UART terminal for debugging
-		  		sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
-		  		if(distance <= 10)
+		 sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
 
-		  				{
-		  				 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
-		  			    }
-		  				else
-		  				{
-		  				HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
-		  				}
+		 if(distance <= 10)
 
-		  		HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
 
-		  		HAL_Delay(1000);
+		  {
+		   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
+		   }
+		  else
+		  	{
+		  	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
+		  	}
 
-		    }
+		  HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
+
+		  HAL_Delay(1000);
+}
 }
 
 void SystemClock_Config(void)
@@ -103,9 +103,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 84;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -156,15 +156,14 @@ void GPIO_Init(void)
 	HAL_GPIO_Init(GPIOA,&ledgpio);
 	}
 
-void usDelay(uint32_t uSec)
+
+void delay_us(uint32_t us)
 {
-	if(uSec < 2) uSec = 2;
-	usTIM->ARR = uSec - 1; 	/*sets the value in the auto-reload register*/
-	usTIM->EGR = 1; 			/*Re-initialises the timer*/
-	usTIM->SR &= ~1; 		//Resets the flag
-	usTIM->CR1 |= 1; 		//Enables the counter
-	while((usTIM->SR&0x0001) != 1);
-	usTIM->SR &= ~(0x0001);
+	//Set the counter value to 0
+	__HAL_TIM_SET_COUNTER(&htimer1,0);
+
+	//wait for the counter to reach the us input in the parameter
+	while(__HAL_TIM_GET_COUNTER(&htimer1) < us);
 }
 
 
@@ -176,7 +175,7 @@ void TIMER1_Init(void)
 	htimer1.Instance = TIM1;
 	htimer1.Init.Prescaler = 84-1;
 	htimer1.Init.CounterMode= TIM_COUNTERMODE_UP;
-	htimer1.Init.Period = 0;
+	htimer1.Init.Period = 0xFFFF-1;
 	htimer1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htimer1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if( HAL_TIM_Base_Init(&htimer1) != HAL_OK )
