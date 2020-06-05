@@ -98,6 +98,17 @@ byte Lock[8] = {
 0b11111,
 0b00000
 };
+byte Plus[8] =
+{
+0b00000,
+0b00000,
+0b00100,
+0b00100,
+0b11111,
+0b00100,
+0b00100,
+0b00000
+};
 
 
 
@@ -105,7 +116,7 @@ void setup() {
   lcd.begin(16,2);  /* Initialize 16x2 LCD */
   lcd.clear();  /* Clear the LCD */
   // create a new character
-  lcd.createChar(0, Heart);
+  lcd.createChar(0, Plus);
   // create a new character
   lcd.createChar(1, Bell);
   // create a new character
@@ -139,7 +150,7 @@ void loop() {
  
   
   lcd.setCursor(0, 1);
-  lcd.write(byte(0));
+  lcd.write(byte(8));
 
   lcd.setCursor(2, 1);
   lcd.write(byte(1));
