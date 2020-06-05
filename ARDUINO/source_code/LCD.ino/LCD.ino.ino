@@ -4,9 +4,6 @@
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3);  /* For 8-bit mode */
 //LiquidCrystal lcd(13, 12, 11, 6, 5, 4, 3);  /* For 4-bit mode */
 
-unsigned char Character1[8] = { 0x04, 0x1F, 0x11, 0x11, 0x1E, 0x1F, 0x1F, 0x1F }; /* Custom Character 1 */
-unsigned char Character2[8] = { 0x01, 0x03, 0x07, 0x1F, 0x1F, 0x07, 0x03, 0x01 }; /* Custom Character 2 */
-
 // make some custom characters:
 byte Heart[8] = {
 0b00000,
