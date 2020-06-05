@@ -109,6 +109,17 @@ byte Plus[8] =
 0b00100,
 0b00000
 };
+byte Symbol[9] =
+{
+0b00100,
+0b01010,
+0b10101,
+0b00100,
+0b01010,
+0b00100,
+0b00100,
+0b00100
+};
 
 
 
@@ -118,7 +129,7 @@ void setup() {
   // create a new character
   lcd.createChar(0, Plus);
   // create a new character
-  lcd.createChar(1, Bell);
+  lcd.createChar(1, Symbol);
   // create a new character
   lcd.createChar(2, Alien);
   // create a new character
@@ -153,7 +164,7 @@ void loop() {
   lcd.write(byte(8));
 
   lcd.setCursor(2, 1);
-  lcd.write(byte(1));
+  lcd.write(byte(9));
 
   lcd.setCursor(4, 1);
   lcd.write(byte(2));
