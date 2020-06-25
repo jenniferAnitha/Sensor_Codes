@@ -46,11 +46,11 @@ int main(void)
 
 	  lcd_print(displayMsg);
 	  HAL_Delay(1);
-	  send_command(0xCF);
-	  lcd_print(displayMsg);
+// 	  send_command(0xCF);
+// 	  lcd_print(displayMsg);
 	  for(i=0;i<=len;i++)
 	  {
-      send_command(0x18);/*Shift the entire display to the left*/
+           send_command(0x18);/*Shift the entire display to the left*/
 	   HAL_Delay(200);
        }
 }
