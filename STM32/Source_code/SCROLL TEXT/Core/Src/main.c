@@ -12,15 +12,13 @@
 #include "main.h"
 #include <stdint.h>
 
-//uint8_t Character1[8] = { 0x0E, 0x1B, 0x11, 0x11, 0x11, 0x11, 0x1F, 0x1F };
-//uint8_t Character2[8] = { 0x04, 0x1F, 0x11, 0x11, 0x1E, 0x1F, 0x1F, 0x1F }; /* Custom Character 1 */
-//uint8_t Character3[8] = { 0x01, 0x03, 0x07, 0x1F, 0x1F, 0x07, 0x03, 0x0F }; /* Custom Character 2 */
+
 
 
 void SystemClock_Config(void);
 void GPIO_Init(void);
 void Error_handler(void);
-void delay(unsigned int time);
+
 
 
 
@@ -131,12 +129,6 @@ void GPIO_Init(void)
 
 }
 
-void delay(unsigned int time)  //Time delay function
-{
-unsigned int i,j;
-for(i=0;i< time;i++)
-for(j=0;j< 5;j++);
-}
 
 void Error_handler(void)
 {
