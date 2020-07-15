@@ -20,6 +20,7 @@ int main(void)
 
 	while(1)
 	{
+		//printf over openocd semihosting
 
 		  initialise_monitor_handles();
 
