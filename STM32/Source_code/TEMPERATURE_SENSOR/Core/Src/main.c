@@ -44,6 +44,20 @@ int main(void)
 	 while (1)
 	 {
 		 HAL_ADC_Start(&hadc1);
+		  
+/**
+  * @brief  Wait for regular group conversion to be completed.
+  * @param  hadc: ADC handle
+  * @param  Timeout: Timeout value in millisecond.
+  * @note   Depending on hadc->Init.EOCSelection, EOS or EOC is 
+  *         checked and cleared depending on AUTDLY bit status. 
+  * @note   HAL_ADC_PollForConversion() returns HAL_ERROR if EOC is polled in a
+  *         DMA-managed conversions configuration: indeed, EOC is immediately 
+  *         reset by the DMA reading the DR register when the converted data is
+  *         available. Therefore, EOC is set for a too short period to be 
+  *         reliably polled.                    
+  * @retval HAL status
+  */
 		 		 if(HAL_ADC_PollForConversion(&hadc1,5)==HAL_OK)
 		 		 {
 		 			 myadcValue=HAL_ADC_GetValue(&hadc1);
