@@ -20,7 +20,7 @@ int main(void)
 
 	while(1)
 	{
-
+//Printf over Open OCD semihosting 
 		  initialise_monitor_handles();
 
 		  	  	  uint32_t value = HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_6);
