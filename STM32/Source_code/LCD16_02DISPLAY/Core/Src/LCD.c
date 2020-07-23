@@ -62,9 +62,10 @@ void lcd_init(void)
 
 void send_command(char cmd)
 {
-
+      //move the 8bit command into GPIOB (PB8-PB15)
 	GPIOB->ODR=(cmd<<8);
 	HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, RESET);
+	//This function is used to make the LCD latch the data into its internal registers
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, SET);
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, RESET);
@@ -74,9 +75,10 @@ void send_command(char cmd)
 /***********************Send Data****************************************************************************/
 void send_data(char data)
 {
-
+//   //move the 8bit data  into GPIOB (PB8-PB15)
 	GPIOB->ODR=(data<<8);
 	HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, SET);
+	//This function is used to make the LCD latch the data into its internal registers
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, SET);
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, RESET);
@@ -113,10 +115,11 @@ void lcd_put_custom_char(uint8_t x, uint8_t y, uint8_t location)
 
 }
 
-//*****************************//
 
 
-//************************************************3.To create a custom Characters
+/*
+To create a custom Characters
+*/
 void lcd_create_custom_char(uint8_t location, uint8_t* data_bytes)
 {
 	int i;
